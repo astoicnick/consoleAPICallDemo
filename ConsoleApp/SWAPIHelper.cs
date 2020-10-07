@@ -17,19 +17,29 @@ namespace ConsoleApp
             httpClient.BaseAddress = new Uri(_baseURL);
         }
 
-        public async Task<string> GetPersonNameByIDAsync(int id)
+        public async Task<SWAPIVehicleModel> GetVehicleByIDAsync(int id)
         {
-            string personsName;
+            HttpResponseMessage vehicleRequest = await httpClient.GetAsync("vehicles/" + id);
+            if (vehicleRequest.IsSuccessStatusCode)
+            {
+                string responseBody = await vehicleRequest.Content.ReadAsStringAsync();
 
+                SWAPIVehicleModel requestedVehicle = JsonConvert.DeserializeObject<SWAPIVehicleModel>(responseBody);
+
+                return requestedVehicle;
+            }
+            return new SWAPIVehicleModel();
+        }
+
+        public async Task<SWAPIPerson> GetPersonByIDAsync(int id)
+        {
             HttpResponseMessage nameRequest = await httpClient.GetAsync("people/" + id);
             // https://swapi.dev/api/people/:id
             string responseBody = await nameRequest.Content.ReadAsStringAsync();
 
             SWAPIPerson requestedPerson = JsonConvert.DeserializeObject<SWAPIPerson>(responseBody);
 
-            personsName = requestedPerson.Name;
-
-            return personsName;
+            return requestedPerson;
         }
     }
 }
